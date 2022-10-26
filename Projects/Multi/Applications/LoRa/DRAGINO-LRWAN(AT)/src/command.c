@@ -229,7 +229,18 @@ static const struct ATCommand_s ATCommand[] =
     .set = at_bandwidth_set,
     .run = at_return_error,
   },
-	
+
+		{
+	  .string = AT_CRCCHECK,
+    .size_string = sizeof(AT_CRCCHECK) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_CRCCHECK":Get or set to receive data check code detection\r\n",
+#endif
+    .get = at_crccheckmod_get,
+    .set = at_crccheckmod_set,
+    .run = at_return_error,
+	},
+			
   {
     .string = AT_CR,
     .size_string = sizeof(AT_CR) - 1,
@@ -329,17 +340,6 @@ static const struct ATCommand_s ATCommand[] =
     .run = at_return_error,
 	},
 
-		{
-	  .string = AT_CRCCHECK,
-    .size_string = sizeof(AT_CRCCHECK) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_CRCCHECK":Get or set to receive data check code detection\r\n",
-#endif
-    .get = at_crccheckmod_get,
-    .set = at_crccheckmod_set,
-    .run = at_return_error,
-	},
-		
 	{
 	  .string = AT_SCHEDULE,
     .size_string = sizeof(AT_SCHEDULE) - 1,
