@@ -52,6 +52,13 @@
 #include "lora.h"
 #include "delay.h"
 
+extern uint8_t testBuff[256];
+extern uint16_t testBuffsize;
+extern bool redled_flash_flag;
+extern uint8_t sendtx_flag;
+extern bool uplink_data_status;
+static uint8_t cmp(const char *param,int len);
+uint8_t rxdata_change_hex(const char *hex, uint8_t *bin);
 /* comment the following to have help message */
 /* #define NO_HELP */
 /* #define NO_KEY_ADDR_EUI */
@@ -524,6 +531,17 @@ static void parse_cmd(const char *cmd)
   if ((cmd[0] != 'A') || (cmd[1] != 'T'))
   {
     status = AT_ERROR;
+		if(cmp(cmd,strlen(cmd))!=0)
+		{
+			testBuffsize=rxdata_change_hex(cmd, testBuff);
+			if(testBuffsize!=0)
+			{
+				redled_flash_flag=1;
+				sendtx_flag=1;
+				uplink_data_status=1;
+			}
+			status = AT_OK;
+		}			
   }
   else
   if (cmd[2] == '\0')
@@ -622,5 +640,64 @@ uint8_t printf_all_config(void)
 	}
 	
 	return 1;
+}
+
+static uint8_t cmp(const char *param,int len)
+{
+	for(int i=0;i<len;i++)
+	{
+		if(((param[i]>='0')&&(param[i]<='9'))||((param[i]>='a')&&(param[i]<='f'))||((param[i]>='A')&&(param[i]<='F'))||(param[i]==' '))
+		{
+
+		}
+		else 
+		{
+			return 0;
+		}
+	}
+	
+	return 1;
+}
+
+uint8_t rxdata_change_hex(const char *hex, uint8_t *bin)
+{
+	uint8_t leg_temp=0;
+  uint8_t flags=0;
+	uint8_t *cur = bin;
+  uint16_t hex_length = strlen(hex);
+  const char *hex_end = hex + hex_length;
+  uint8_t num_chars = 0;
+  uint8_t byte = 0;
+	
+  while (hex < hex_end) {
+        flags=0;
+        if ('A' <= *hex && *hex <= 'F') {
+            byte |= 10 + (*hex - 'A');
+        } else if ('a' <= *hex && *hex <= 'f') {
+            byte |= 10 + (*hex - 'a');
+        } else if ('0' <= *hex && *hex <= '9') {
+            byte |= *hex - '0';
+        } else if (*hex == ' ') {
+           flags=1;
+        }else {
+            return 0;
+        }
+        hex++;
+        
+        if(flags==0)
+        {
+          num_chars++;
+          if (num_chars >= 2) {
+              num_chars = 0;
+              *cur++ = byte;
+							leg_temp++;
+              byte = 0;
+             } else {
+              byte <<= 4;
+             }
+        }
+    }	
+	
+	 return leg_temp;
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -261,17 +261,20 @@ int main( void )
 				txDataBuff[txBufferSize-3] = crc_check>>8&0xff;
 				txDataBuff[txBufferSize-2] = crc_check>>16&0xff;
 				txDataBuff[txBufferSize-1] = crc_check>>24&0xff;				
-				Radio.Send( txDataBuff, txBufferSize );						
+				Radio.Send( txDataBuff, txBufferSize );
+			  exitflag1=0;				
 			}
 			else if(response_data_status==1)	
 			{
 				Send_response_data();
-				response_data_status=0;				
+				response_data_status=0;
+			  exitflag1=0;				
 			}				
 			else if(test_uplink_status==1)		
 			{
 				Send_test_data();
 				test_uplink_status=0;
+			  exitflag1=0;
 			}				
 			else
 			{
@@ -683,6 +686,21 @@ static void test_OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t
 				HAL_Delay(6);
 			}
 			PPRINTF("\r\n");
+			
+			PPRINTF("RS485 DATA: ");
+			if(size<=16)
+			{
+				PPRINTF("NULL\r\n");
+			}
+			else
+			{
+				for(uint16_t i=12;i<size-4;i++)
+				{
+					PPRINTF("%02x ",payload[i]);
+					HAL_Delay(6);
+				}
+				PPRINTF("\r\n");			
+			}
 			
 			AppData.Buff=rxDataBuff;
       AppData.BuffSize=rxBufferSize;

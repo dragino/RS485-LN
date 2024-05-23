@@ -134,7 +134,7 @@ void fdr_config(void)
 	APP_TX_DUTYCYCLE=600000;
 	tx_spreading_value=12;
 	rx_spreading_value=12;
-	tx_signal_freqence=868700000;
+	tx_signal_freqence=869000000;
 	rx_signal_freqence=869000000;
 	
 	EEPROM_Store_Config();
